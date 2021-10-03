@@ -89,6 +89,7 @@ void stack_pop (stack_struct *cur_stack, size_t pop_by) {
     for (int step = 0; step < pop_by; step++) {
         cur_stack->size--;
         cur_stack->ptr_begin[cur_stack->size + 1] = toxic;
+        cur_stack->hash = stack_hash_sum(cur_stack);
 
         if (cur_stack->size < ( (cur_stack->capacity / stack_increase_multiplier)) - 2) {
             stack_decrease(cur_stack);
@@ -103,7 +104,7 @@ void stack_pop (stack_struct *cur_stack, size_t pop_by) {
 void stack_decrease (stack_struct *cur_stack) {
     assert(cur_stack != nullptr);
 
-    //stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
 
 
     canary save_canary = cur_stack->ptr_begin[cur_stack->capacity - 1];
@@ -125,9 +126,18 @@ canary stack_hash_sum (stack_struct *cur_stack) {
     assert(cur_stack != NULL && "hash_sum: cur_stack = NULL");
 
     unsigned long long res = 0;
+    int sz = sizeof(*cur_stack);
 
     for (unsigned index = 0; index < cur_stack->size; index++) {
         res += cur_stack->ptr_begin[index];
+        res += sz;
+    }
+
+    for (int index = 0; index < sz; index++) {
+        res += cur_stack->size;
+        res += cur_stack->capacity;
+        res += cur_stack->canary_end;
+        res += cur_stack->canary_beg;
     }
 
     return res;
