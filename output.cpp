@@ -54,58 +54,59 @@ void stack_dump(stack_struct *cur_stack) {
         abort();
     }
 
-    int code = STACK_IS_OK(cur_stack, __FILE__, __LINE__, (char *)__func__);
+    int code = STACK_IS_OK(cur_stack, __FILE__, __LINE__, (char *) __func__);
 
-    printf("code: %d\n", code);
-
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_end ]");
-    if (cur_stack->ptr_begin[cur_stack->capacity - 1] != cur_stack->canary_end) {
-        printf(RED"%10s", "\t(ERROR)\n");
+    if (code == 0) {
+        return;
     }
+
     else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
 
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ Stack size ]");
+        printf("code: %d\n", code);
 
-    if (cur_stack->size < 0 || cur_stack->size > cur_stack->capacity) {
-        printf(RED"%10s", "\t(ERROR)\n");
-    }
-    else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_end ]");
+        if (cur_stack->ptr_begin[cur_stack->capacity - 1] != cur_stack->canary_end) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
 
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ capacity ]");
-    if (cur_stack->capacity < 0) {
-        printf(RED"%10s", "\t(ERROR)\n");
-    }
-    else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ Stack size ]");
 
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ ptr_begin ]");
-    if (cur_stack->ptr_begin == nullptr) {
-        printf(RED"%10s", "\t(ERROR)\n");
-    }
-    else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
+        if (cur_stack->size < 0 || cur_stack->size > cur_stack->capacity) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
 
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ hash ]");
-    if (cur_stack->hash != stack_hash_sum(cur_stack)) {
-        printf(RED"%10s", "\t(ERROR)\n");
-    }
-    else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ capacity ]");
+        if (cur_stack->capacity < 0) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
 
-    printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_beg ]");
-    if (cur_stack->ptr_begin[0] != cur_stack->ptr_begin[0]) {
-        printf(RED"%10s", "\t(ERROR)\n");
-    }
-    else {
-        printf(GREEN"%10s", "(OK)\n");
-    }
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ ptr_begin ]");
+        if (cur_stack->ptr_begin == nullptr) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
 
-    abort();
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ hash ]");
+        if (cur_stack->hash != stack_hash_sum(cur_stack)) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
+
+        printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_beg ]");
+        if (cur_stack->ptr_begin[0] != cur_stack->ptr_begin[0]) {
+            printf(RED"%10s", "\t(ERROR)\n");
+        } else {
+            printf(GREEN"%10s", "(OK)\n");
+        }
+
+        abort();
+    }
 }
