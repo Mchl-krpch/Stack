@@ -39,6 +39,8 @@ void stack_ctor(stack_struct *new_stack) {
 void stack_push (stack_struct *cur_stack, stack_type new_elem) {
     assert(cur_stack != nullptr && "std_push: cur_stack = NULL");
 
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
+
     if (cur_stack->size >= cur_stack->capacity - 2) {
         stack_increase(cur_stack);
     }
@@ -60,6 +62,8 @@ void stack_push (stack_struct *cur_stack, stack_type new_elem) {
 void stack_increase (stack_struct *cur_stack) {
     assert(cur_stack != nullptr);
 
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
+
     canary save_canary = cur_stack->canary_end;
     cur_stack->ptr_begin[cur_stack->capacity - 1] = toxic;
 
@@ -73,6 +77,8 @@ void stack_increase (stack_struct *cur_stack) {
     cur_stack->ptr_begin[cur_stack->capacity-1] = save_canary;
 
     cur_stack->hash = stack_hash_sum(cur_stack);
+
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
 }
 
 void stack_pop (stack_struct *cur_stack, size_t pop_by) {
@@ -122,7 +128,6 @@ canary stack_hash_sum (stack_struct *cur_stack) {
 
     for (unsigned index = 0; index < cur_stack->size; index++) {
         res += cur_stack->ptr_begin[index];
-        //res  = res ^ cur_stack->hash / 2;
     }
 
     return res;
