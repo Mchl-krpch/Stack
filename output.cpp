@@ -48,13 +48,13 @@ int STACK_IS_OK(stack_struct *cur_stack, char *path, int line, char *func_name) 
     return special_code;
 }
 
-void stack_dump(stack_struct *cur_stack) {
+void stack_dump(stack_struct *cur_stack, char *func_name, int line) {
     if (cur_stack->ptr_begin == nullptr) {
         printf(RED"BAD STACK PTR: \t(ERROR)\n");
         abort();
     }
 
-    int code = STACK_IS_OK(cur_stack, __FILE__, __LINE__, (char *) __func__);
+    int code = STACK_IS_OK(cur_stack, __FILE__, line, func_name);
 
     if (code == 0) {
         return;
