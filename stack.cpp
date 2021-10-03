@@ -52,6 +52,9 @@ void stack_push (stack_struct *cur_stack, stack_type new_elem) {
     }
 
     cur_stack->hash = stack_hash_sum(cur_stack);
+
+    //printf("%d, %d", cur_stack->hash, stack_hash_sum(cur_stack));
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
 }
 
 void stack_increase (stack_struct *cur_stack) {
@@ -75,9 +78,7 @@ void stack_increase (stack_struct *cur_stack) {
 void stack_pop (stack_struct *cur_stack, size_t pop_by) {
     assert(cur_stack != nullptr);
 
-    //printf("%s\n", __FILE__);
-    //print_path(LOL)
-    STACK_IS_OK(cur_stack, __FILE__, __LINE__, (char *)__FUNCTION__);
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
 
     for (int step = 0; step < pop_by; step++) {
         cur_stack->size--;
@@ -89,10 +90,15 @@ void stack_pop (stack_struct *cur_stack, size_t pop_by) {
 
         cur_stack->hash = stack_hash_sum(cur_stack);
     }
+
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
 }
 
 void stack_decrease (stack_struct *cur_stack) {
     assert(cur_stack != nullptr);
+
+    //stack_dump(cur_stack, (char *)__func__, __LINE__);
+
 
     canary save_canary = cur_stack->ptr_begin[cur_stack->capacity - 1];
     cur_stack->ptr_begin[cur_stack->capacity - 1] = toxic;
@@ -104,6 +110,9 @@ void stack_decrease (stack_struct *cur_stack) {
     cur_stack->ptr_begin[cur_stack->capacity - 1] = save_canary;
 
     cur_stack->hash = stack_hash_sum(cur_stack);
+
+    stack_dump(cur_stack, (char *)__func__, __LINE__);
+
 }
 
 canary stack_hash_sum (stack_struct *cur_stack) {
@@ -113,10 +122,8 @@ canary stack_hash_sum (stack_struct *cur_stack) {
 
     for (unsigned index = 0; index < cur_stack->size; index++) {
         res += cur_stack->ptr_begin[index];
-        res  = res ^ cur_stack->hash / 2;
-        //res  = res << stack_increase_multiplier;
+        //res  = res ^ cur_stack->hash / 2;
     }
-    //printf("HASH: %X\n\n", res);
 
     return res;
 }
