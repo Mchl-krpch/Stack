@@ -12,12 +12,12 @@ extern int ERROR_CODE;
 
 
 typedef  struct stk{
-    int              capacity;    //максимальный размер
-    int                  size;    //количество элементов сейчас
-    canary         canary_beg;    //канарейка в начале стека
-    stack_type     *ptr_begin;    //путь к началу стака
-    canary         canary_end;    //канарейка в конце массива
-    canary               hash;    //Хэш стака
+    int              capacity = -1;    //максимальный размер
+    int                  size = -1;    //количество элементов сейчас
+    canary         canary_beg = NULL;    //канарейка в начале стека
+    stack_type     *ptr_begin = NULL;    //путь к началу стака
+    canary         canary_end = NULL;    //канарейка в конце массива
+    canary               hash = NULL;    //Хэш стака
 
 }stack_struct;
 
@@ -29,10 +29,5 @@ void stack_pop          (stack_struct *cur_stack, size_t pop_by);
 canary stack_hash_sum   (stack_struct *cur_stack               );
 void stack_dtor         (stack_struct *new_stack               );
 
-
-void place_canaries(stack_struct *cur_stack);
-
-#define check_stack(message) \
-    printf("path: %s(%d), mes: %s", __FILE__, __LINE__, #message);
 
 #endif //STACK_2_STACK_H
