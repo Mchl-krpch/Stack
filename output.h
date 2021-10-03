@@ -12,7 +12,7 @@
 
 #define GREEN  "\x1b[32m"
 #define RED    "\x1b[31m"
-#define WHTITE "\e[0;37m"
+#define WHITE "\e[0;37m"
 
 
 enum ERRORS_CODES {
@@ -27,7 +27,9 @@ enum ERRORS_CODES {
 
 };
 
-void STACK_IS_OK(stack_struct *cur_stack, char *path, int line, char *func_name);
+int STACK_IS_OK(stack_struct *cur_stack, char *path, int line, char *func_name);
+
+void stack_dump(stack_struct *cur_stack, char *func_name, int line);
 
 void STACK_VALID(stack_struct *cur_stack);
 
