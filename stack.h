@@ -12,12 +12,12 @@ extern int ERROR_CODE;
 
 
 typedef  struct stk{
-    int              capacity = -1;    //максимальный размер
-    int                  size = -1;    //количество элементов сейчас
-    canary         canary_beg = NULL;    //канарейка в начале стека
-    stack_type     *ptr_begin = NULL;    //путь к началу стака
-    canary         canary_end = NULL;    //канарейка в конце массива
-    canary               hash = NULL;    //Хэш стака
+    int              capacity;    //максимальный размер
+    int                  size;    //количество элементов сейчас
+    canary         canary_beg;    //канарейка в начале стека
+    stack_type     *ptr_begin;    //путь к началу стака
+    canary         canary_end;    //канарейка в конце массива
+    canary               hash;    //Хэш стака
 
 }stack_struct;
 
