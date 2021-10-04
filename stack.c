@@ -9,8 +9,8 @@
 const int start_cap = 2;
 const int stack_increase_multiplier = 2;
 
-int toxic = 0xBADD;
-int ERROR_CODE = -1;
+const int toxic  = 0xBADD;
+const int Free   = 0xF2EE;
 
 
 void stack_ctor(stack_struct *new_stack) {
@@ -132,4 +132,17 @@ canary stack_hash_sum (stack_struct *cur_stack) {
     res += cur_stack->canary_beg * sz;
 
     return res;
+}
+
+void stack_dtor(stack_struct *cur_stack) {
+    for (int elem = 0; elem < cur_stack->capacity - 1; elem++) {
+        cur_stack->ptr_begin[elem] = Free;
+    }
+
+    cur_stack->size       = 0;
+    cur_stack->capacity   = 0;
+    cur_stack->canary_end = 0;
+    cur_stack->canary_beg = 0;
+
+    free(cur_stack->ptr_begin);
 }
