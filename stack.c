@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "assert.h"
 
 #include "stack.h"
@@ -9,13 +10,10 @@ const int start_cap = 2;
 const int stack_increase_multiplier = 2;
 
 int toxic = 0xBADD;
-
 int ERROR_CODE = -1;
 
 
 void stack_ctor(stack_struct *new_stack) {
-    assert(new_stack != NULL && "std_ctor: new_stack = NULL");
-
     new_stack->capacity = start_cap;
     new_stack->size     = new_stack->capacity - 2;
 
@@ -29,11 +27,9 @@ void stack_ctor(stack_struct *new_stack) {
 
     new_stack->hash = stack_hash_sum(new_stack);
 
-    new_stack->ptr_begin[0] = new_stack->canary_beg;
+    new_stack->ptr_begin[0                      ] = new_stack->canary_beg;
 
     new_stack->ptr_begin[new_stack->capacity - 1] = new_stack->canary_end;
-
-    printf("stack constructor: created\n");
 }
 
 void stack_push (stack_struct *cur_stack, stack_type new_elem) {
@@ -46,8 +42,8 @@ void stack_push (stack_struct *cur_stack, stack_type new_elem) {
     }
 
     cur_stack->size++;
-    if (!(cur_stack->ptr_begin[cur_stack->size] == toxic)) {
-        printf("BAD VALUE IN STACK size: %d value: %d\n", cur_stack->size, cur_stack->ptr_begin[cur_stack->size]);
+    if ((cur_stack->ptr_begin[cur_stack->size] != 0xBADD)) {
+        stack_dump(cur_stack, (char *)__func__ , __LINE__);
     }
     else {
         cur_stack->ptr_begin[cur_stack->size] = new_elem;
@@ -55,7 +51,6 @@ void stack_push (stack_struct *cur_stack, stack_type new_elem) {
 
     cur_stack->hash = stack_hash_sum(cur_stack);
 
-    //printf("%d, %d", cur_stack->hash, stack_hash_sum(cur_stack));
     stack_dump(cur_stack, (char *)__func__, __LINE__);
 }
 
@@ -70,7 +65,7 @@ void stack_increase (stack_struct *cur_stack) {
     cur_stack->capacity *= stack_increase_multiplier;
     cur_stack->ptr_begin = (int *) realloc(cur_stack->ptr_begin, cur_stack->capacity * sizeof(int));
 
-    for (int elem = cur_stack->size + 1; elem < cur_stack->capacity; elem++) {
+    for (int elem = cur_stack->size + 1; elem < cur_stack->capacity - 1; elem++) {
         cur_stack->ptr_begin[elem] = toxic;
     }
 
@@ -119,7 +114,6 @@ void stack_decrease (stack_struct *cur_stack) {
     cur_stack->hash = stack_hash_sum(cur_stack);
 
     stack_dump(cur_stack, (char *)__func__, __LINE__);
-
 }
 
 canary stack_hash_sum (stack_struct *cur_stack) {
@@ -129,16 +123,13 @@ canary stack_hash_sum (stack_struct *cur_stack) {
     int sz = sizeof(*cur_stack);
 
     for (unsigned index = 0; index < cur_stack->size; index++) {
-        res += cur_stack->ptr_begin[index];
-        res += sz;
+        res += cur_stack->ptr_begin[index] * index;
     }
 
-    for (int index = 0; index < sz; index++) {
-        res += cur_stack->size;
-        res += cur_stack->capacity;
-        res += cur_stack->canary_end;
-        res += cur_stack->canary_beg;
-    }
+    res += cur_stack->size * sz;
+    res += cur_stack->capacity * sz;
+    res += cur_stack->canary_end * sz;
+    res += cur_stack->canary_beg * sz;
 
     return res;
 }
