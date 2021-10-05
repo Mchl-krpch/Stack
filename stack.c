@@ -27,11 +27,11 @@ int stack_ctor(Stack *stack, int start_size) {
         stack->ptr_begin[index] = TOXIC;
     }
 
-    stack->hash = stack_hash(stack);
-
-    stack->ptr_begin[0                      ] = stack->canary_beg;
+    stack->ptr_begin[0] = stack->canary_beg;
 
     stack->ptr_begin[stack->capacity - 1] = stack->canary_end;
+
+    stack->hash = stack_hash(stack);
 }
 
 int stack_push (Stack *stack, int new_elem) {
@@ -117,23 +117,25 @@ int stack_decrease (Stack *stack) {
     stack->hash = stack_hash(stack);
 
     stack_dump(stack, (char *)__func__, __LINE__);
+    
     return 0;
 }
 
 int stack_hash(Stack *stack) {
     assert(stack != NULL && "hash_sum: cur_stack = NULL");
 
-    unsigned long long res = 0;
-    int sz = sizeof(*stack);
+    int res = 0;
 
-    for (unsigned index = 0; index < stack->size; index++) {
-        res += stack->ptr_begin[index] * index;
+    char *data = (char *)stack->ptr_begin;
+
+    for (int index = 0; index < stack->capacity - 1; index++) {
+        res += data[index] * index;
     }
 
-    res += stack->size * sz;
-    res += stack->capacity * sz;
-    res += stack->canary_end * sz;
-    res += stack->canary_beg * sz;
+    char *data2 = (char *)stack;
+    for (int index = 0; index < sizeof(Stack) - sizeof(int) * 2; index++) {
+        res += data2[index] * index;
+    }
 
     return res;
 }
