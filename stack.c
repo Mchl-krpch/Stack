@@ -1,17 +1,17 @@
 #include <stdio.h>
+#include <cstdint>
 
 #include "assert.h"
 
 #include "stack.h"
 #include "output.h"
 
-const int INCREASE_MULTIPLIER = 2;
+const int IncreaseMultiplier = 2;
 
-const int TOXIC  = 0xBADD;
-const int FREE   = 0xF2EE;
+const int Toxic  = 0xBADD;
+const int Free   = 0xF2EE;
 
 int CODE = 0;
-
 
 int stack_ctor(Stack *stack, int start_size) {
     assert(stack != nullptr && "stack_ctor: stack = nullptr");
@@ -19,128 +19,166 @@ int stack_ctor(Stack *stack, int start_size) {
     stack->size = start_size;
     stack->capacity = start_size + 2;
 
-    stack->canary_beg = CANARY;
-    stack->canary_end = CANARY;
+    stack->canary_beg = Canary;
+    stack->canary_end = Canary;
 
-    stack->ptr_begin = (int *)calloc(stack->capacity, sizeof(int));
-    for (int index = 0; index < stack->capacity - 1; index++) {
-        stack->ptr_begin[index] = TOXIC;
+    stack->data = (sType *)calloc(stack->capacity, sizeof(sType));
+
+    if (stack->data == nullptr) {
+        stack_dump(stack, __func__, __LINE__);
     }
 
-    stack->ptr_begin[0] = stack->canary_beg;
+    for (int index = 0; index < stack->capacity - 1; index++) {
+        stack->data[index] = Toxic;
+    }
 
-    stack->ptr_begin[stack->capacity - 1] = stack->canary_end;
+    stack->data[0] = stack->canary_beg;
+
+    stack->data[stack->capacity - 1] = stack->canary_end;
 
     stack->hash = stack_hash(stack);
+
+    return 0;
 }
 
-int stack_push (Stack *stack, int new_elem) {
+int stack_push (Stack *stack, sType new_elem) {
     assert(stack != nullptr && "std_push: cur_stack = NULL");
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
 
     if (stack->size >= stack->capacity - 2) {
         stack_increase(stack);
     }
 
     stack->size++;
-    if ((stack->ptr_begin[stack->size] != 0xBADD)) {
-        stack_dump(stack, (char *)__func__ , __LINE__);
+    stack->hash = stack_hash(stack);
+    if ((stack->data[stack->size] != 0xBADD)) {
+        stack_dump(stack, __func__ , __LINE__);
     }
     else {
-        stack->ptr_begin[stack->size] = new_elem;
+        stack->data[stack->size] = new_elem;
     }
 
     stack->hash = stack_hash(stack);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
+
+    return 0;
 }
 
 int stack_increase (Stack *stack) {
     assert(stack != nullptr);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
 
-    int save_canary = stack->canary_end;
-    stack->ptr_begin[stack->capacity - 1] = TOXIC;
 
-    stack->capacity *= INCREASE_MULTIPLIER;
-    stack->ptr_begin = (int *) realloc(stack->ptr_begin, stack->capacity * sizeof(int));
+    stack->capacity *= IncreaseMultiplier;
+    stack->data = (int *) realloc(stack->data, stack->capacity * sizeof(int));
 
-    for (int elem = stack->size + 1; elem < stack->capacity - 1; elem++) {
-        stack->ptr_begin[elem] = TOXIC;
+    if (stack->data == nullptr) {
+        stack_dump(stack, __func__, __LINE__);
     }
 
-    stack->ptr_begin[stack->capacity-1] = save_canary;
+    for (int elem = stack->size; elem < stack->capacity - 1; elem++) {
+        stack->data[elem] = Toxic;
+    }
+
+    stack->data[stack->capacity-1] = Canary;
 
     stack->hash = stack_hash(stack);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
+
+    return 0;
 }
 
-int stack_pop (Stack *stack, size_t pop_by) {
+int stack_pop (Stack *stack) {
     assert(stack != nullptr);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
 
-    for (int step = 0; step < pop_by; step++) {
-        stack->size--;
-        stack->ptr_begin[stack->size + 1] = TOXIC;
-        stack->hash = stack_hash(stack);
+    stack->size--;
+    stack->data[stack->size + 1] = Toxic;
+    stack->hash = stack_hash(stack);
 
-        if (stack->size < ( (stack->capacity / INCREASE_MULTIPLIER)) - 2) {
-            stack_decrease(stack);
-        }
-
+    if (stack->size < ( (stack->capacity / IncreaseMultiplier)) - 2) {
+        stack_decrease(stack);
         stack->hash = stack_hash(stack);
     }
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
+
     return 0;
 }
 
 int stack_decrease (Stack *stack) {
     assert(stack != nullptr);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
+    stack_dump(stack, __func__, __LINE__);
 
+    stack->capacity /= IncreaseMultiplier;
 
-    int save_canary = stack->ptr_begin[stack->capacity - 1];
-    stack->ptr_begin[stack->capacity - 1] = TOXIC;
+    stack->data = (int *) realloc(stack->data, stack->capacity * sizeof(int));
 
-    stack->capacity /= INCREASE_MULTIPLIER;
+    if (stack->data == nullptr) {
+        stack_dump(stack, __func__, __LINE__);
+    }
 
-    stack->ptr_begin = (int *) realloc(stack->ptr_begin, stack->capacity * sizeof(int));
-
-    stack->ptr_begin[stack->capacity - 1] = save_canary;
+    stack->data[stack->capacity - 1] = Canary;
 
     stack->hash = stack_hash(stack);
 
-    stack_dump(stack, (char *)__func__, __LINE__);
-    
+    stack_dump(stack, __func__, __LINE__);
+
+
     return 0;
 }
 
-int stack_hash(Stack *stack) {
+int stack_shrink (Stack *stack) {
+    assert(stack != nullptr);
+
+    stack_dump(stack, __func__, __LINE__);
+
+    stack->data = (int *) realloc(stack->data, stack->size * sizeof(int));
+
+    stack->capacity = stack->size + 1;
+
+    if (stack->data == nullptr) {
+        stack_dump(stack, __func__, __LINE__);
+    }
+
+    stack->data[stack->capacity - 1] = Canary;
+
+    stack->hash = stack_hash(stack);
+
+    stack_dump(stack, __func__, __LINE__);
+
+
+    return 0;
+}
+
+uint64_t stack_hash(Stack *stack) {
     assert(stack != NULL && "hash_sum: cur_stack = NULL");
 
     int res = 0;
 
-    char *data = (char *)stack->ptr_begin;
+    char *data = (char *)stack->data;
 
     for (int index = 0; index < stack->capacity - 1; index++) {
         res += data[index] * index;
     }
 
     char *data2 = (char *)stack;
-    for (int index = 0; index < sizeof(Stack) - sizeof(int) * 2; index++) {
+    for (int index = 0; index < 4 * sizeof(int); index++) {
         res += data2[index] * index;
     }
+
+    printf("hash: %d sizeof: %d", res, sizeof(Stack));
 
     return res;
 }
 
-int murmurhash(char *key, unsigned int len) {
+uint64_t murmurhash(char *key, unsigned int len) {
     const unsigned int mur = 0x5bd1e995;
     const unsigned int special_code = 0;
     const int r = 24;
@@ -148,7 +186,7 @@ int murmurhash(char *key, unsigned int len) {
     unsigned int h = special_code ^ len;
     const unsigned char *data = (const unsigned char *)key;
 
-    unsigned int k;
+    uint64_t k;
     while (len >= 4) {
         k = data[0];
         k |= data[1] << 8;
@@ -186,7 +224,7 @@ int murmurhash(char *key, unsigned int len) {
 
 int stack_dtor(Stack *stack) {
     for (int elem = 0; elem < stack->capacity - 1; elem++) {
-        stack->ptr_begin[elem] = FREE;
+        stack->data[elem] = Free;
     }
 
     stack->size       = 0;
@@ -194,6 +232,7 @@ int stack_dtor(Stack *stack) {
     stack->canary_end = 0;
     stack->canary_beg = 0;
 
-    free(stack->ptr_begin);
+    free(stack->data);
+
     return 0;
 }
