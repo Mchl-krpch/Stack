@@ -5,144 +5,193 @@
 #include "stack.h"
 #include "output.h"
 
+const int INCREASE_MULTIPLIER = 2;
 
-const int start_cap = 2;
-const int stack_increase_multiplier = 2;
+const int TOXIC  = 0xBADD;
+const int FREE   = 0xF2EE;
 
-const int toxic  = 0xBADD;
-const int Free   = 0xF2EE;
+int CODE = 0;
 
 
-void stack_ctor(stack_struct *new_stack) {
-    new_stack->capacity = start_cap;
-    new_stack->size     = new_stack->capacity - 2;
+int stack_ctor(Stack *stack, int start_size) {
+    assert(stack != nullptr && "stack_ctor: stack = nullptr");
 
-    new_stack->canary_beg = 0xB12DBE << sizeof(stack_type);
-    new_stack->canary_end = 0xB12DE  << sizeof(stack_type);
+    stack->size = start_size;
+    stack->capacity = start_size + 2;
 
-    new_stack->ptr_begin = (stack_type *)calloc(new_stack->capacity, sizeof(stack_type));
-    for (int index = 0; index < new_stack->capacity - 1; index++) {
-        new_stack->ptr_begin[index] = toxic;
+    stack->canary_beg = CANARY;
+    stack->canary_end = CANARY;
+
+    stack->ptr_begin = (int *)calloc(stack->capacity, sizeof(int));
+    for (int index = 0; index < stack->capacity - 1; index++) {
+        stack->ptr_begin[index] = TOXIC;
     }
 
-    new_stack->hash = stack_hash_sum(new_stack);
+    stack->hash = stack_hash(stack);
 
-    new_stack->ptr_begin[0                      ] = new_stack->canary_beg;
+    stack->ptr_begin[0                      ] = stack->canary_beg;
 
-    new_stack->ptr_begin[new_stack->capacity - 1] = new_stack->canary_end;
+    stack->ptr_begin[stack->capacity - 1] = stack->canary_end;
 }
 
-void stack_push (stack_struct *cur_stack, stack_type new_elem) {
-    assert(cur_stack != nullptr && "std_push: cur_stack = NULL");
+int stack_push (Stack *stack, int new_elem) {
+    assert(stack != nullptr && "std_push: cur_stack = NULL");
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 
-    if (cur_stack->size >= cur_stack->capacity - 2) {
-        stack_increase(cur_stack);
+    if (stack->size >= stack->capacity - 2) {
+        stack_increase(stack);
     }
 
-    cur_stack->size++;
-    if ((cur_stack->ptr_begin[cur_stack->size] != 0xBADD)) {
-        stack_dump(cur_stack, (char *)__func__ , __LINE__);
+    stack->size++;
+    if ((stack->ptr_begin[stack->size] != 0xBADD)) {
+        stack_dump(stack, (char *)__func__ , __LINE__);
     }
     else {
-        cur_stack->ptr_begin[cur_stack->size] = new_elem;
+        stack->ptr_begin[stack->size] = new_elem;
     }
 
-    cur_stack->hash = stack_hash_sum(cur_stack);
+    stack->hash = stack_hash(stack);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 }
 
-void stack_increase (stack_struct *cur_stack) {
-    assert(cur_stack != nullptr);
+int stack_increase (Stack *stack) {
+    assert(stack != nullptr);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 
-    canary save_canary = cur_stack->canary_end;
-    cur_stack->ptr_begin[cur_stack->capacity - 1] = toxic;
+    int save_canary = stack->canary_end;
+    stack->ptr_begin[stack->capacity - 1] = TOXIC;
 
-    cur_stack->capacity *= stack_increase_multiplier;
-    cur_stack->ptr_begin = (int *) realloc(cur_stack->ptr_begin, cur_stack->capacity * sizeof(int));
+    stack->capacity *= INCREASE_MULTIPLIER;
+    stack->ptr_begin = (int *) realloc(stack->ptr_begin, stack->capacity * sizeof(int));
 
-    for (int elem = cur_stack->size + 1; elem < cur_stack->capacity - 1; elem++) {
-        cur_stack->ptr_begin[elem] = toxic;
+    for (int elem = stack->size + 1; elem < stack->capacity - 1; elem++) {
+        stack->ptr_begin[elem] = TOXIC;
     }
 
-    cur_stack->ptr_begin[cur_stack->capacity-1] = save_canary;
+    stack->ptr_begin[stack->capacity-1] = save_canary;
 
-    cur_stack->hash = stack_hash_sum(cur_stack);
+    stack->hash = stack_hash(stack);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 }
 
-void stack_pop (stack_struct *cur_stack, size_t pop_by) {
-    assert(cur_stack != nullptr);
+int stack_pop (Stack *stack, size_t pop_by) {
+    assert(stack != nullptr);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 
     for (int step = 0; step < pop_by; step++) {
-        cur_stack->size--;
-        cur_stack->ptr_begin[cur_stack->size + 1] = toxic;
-        cur_stack->hash = stack_hash_sum(cur_stack);
+        stack->size--;
+        stack->ptr_begin[stack->size + 1] = TOXIC;
+        stack->hash = stack_hash(stack);
 
-        if (cur_stack->size < ( (cur_stack->capacity / stack_increase_multiplier)) - 2) {
-            stack_decrease(cur_stack);
+        if (stack->size < ( (stack->capacity / INCREASE_MULTIPLIER)) - 2) {
+            stack_decrease(stack);
         }
 
-        cur_stack->hash = stack_hash_sum(cur_stack);
+        stack->hash = stack_hash(stack);
     }
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
+    return 0;
 }
 
-void stack_decrease (stack_struct *cur_stack) {
-    assert(cur_stack != nullptr);
+int stack_decrease (Stack *stack) {
+    assert(stack != nullptr);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
 
 
-    canary save_canary = cur_stack->ptr_begin[cur_stack->capacity - 1];
-    cur_stack->ptr_begin[cur_stack->capacity - 1] = toxic;
+    int save_canary = stack->ptr_begin[stack->capacity - 1];
+    stack->ptr_begin[stack->capacity - 1] = TOXIC;
 
-    cur_stack->capacity /= stack_increase_multiplier;
+    stack->capacity /= INCREASE_MULTIPLIER;
 
-    cur_stack->ptr_begin = (int *) realloc(cur_stack->ptr_begin, cur_stack->capacity * sizeof(int));
+    stack->ptr_begin = (int *) realloc(stack->ptr_begin, stack->capacity * sizeof(int));
 
-    cur_stack->ptr_begin[cur_stack->capacity - 1] = save_canary;
+    stack->ptr_begin[stack->capacity - 1] = save_canary;
 
-    cur_stack->hash = stack_hash_sum(cur_stack);
+    stack->hash = stack_hash(stack);
 
-    stack_dump(cur_stack, (char *)__func__, __LINE__);
+    stack_dump(stack, (char *)__func__, __LINE__);
+    return 0;
 }
 
-canary stack_hash_sum (stack_struct *cur_stack) {
-    assert(cur_stack != NULL && "hash_sum: cur_stack = NULL");
+int stack_hash(Stack *stack) {
+    assert(stack != NULL && "hash_sum: cur_stack = NULL");
 
     unsigned long long res = 0;
-    int sz = sizeof(*cur_stack);
+    int sz = sizeof(*stack);
 
-    for (unsigned index = 0; index < cur_stack->size; index++) {
-        res += cur_stack->ptr_begin[index] * index;
+    for (unsigned index = 0; index < stack->size; index++) {
+        res += stack->ptr_begin[index] * index;
     }
 
-    res += cur_stack->size * sz;
-    res += cur_stack->capacity * sz;
-    res += cur_stack->canary_end * sz;
-    res += cur_stack->canary_beg * sz;
+    res += stack->size * sz;
+    res += stack->capacity * sz;
+    res += stack->canary_end * sz;
+    res += stack->canary_beg * sz;
 
     return res;
 }
 
-void stack_dtor(stack_struct *cur_stack) {
-    for (int elem = 0; elem < cur_stack->capacity - 1; elem++) {
-        cur_stack->ptr_begin[elem] = Free;
+int murmurhash(char *key, unsigned int len) {
+    const unsigned int mur = 0x5bd1e995;
+    const unsigned int special_code = 0;
+    const int r = 24;
+
+    unsigned int h = special_code ^ len;
+    const unsigned char *data = (const unsigned char *)key;
+
+    unsigned int k;
+    while (len >= 4) {
+        k = data[0];
+        k |= data[1] << 8;
+        k |= data[1] << 16;
+        k |= data[1] << 24;
+
+        k *= mur;
+        k ^= k >> r;
+        k *= mur;
+
+        h *= mur;
+        h ^=k;
+
+        data += 4;
+        len -=4;
     }
 
-    cur_stack->size       = 0;
-    cur_stack->capacity   = 0;
-    cur_stack->canary_end = 0;
-    cur_stack->canary_beg = 0;
+    switch (len) {
+        case 3:
+            h ^= data[2] <<16;
+        case 2:
+            h ^= data[1] <<8;
+        case 1:
+            h ^= data[0];
+            h *= mur;
 
-    free(cur_stack->ptr_begin);
+    };
+
+    h ^= h >> 13;
+    h *= mur;
+    h ^= h >> 15;
+
+    return h;
+}
+
+int stack_dtor(Stack *stack) {
+    for (int elem = 0; elem < stack->capacity - 1; elem++) {
+        stack->ptr_begin[elem] = FREE;
+    }
+
+    stack->size       = 0;
+    stack->capacity   = 0;
+    stack->canary_end = 0;
+    stack->canary_beg = 0;
+
+    free(stack->ptr_begin);
+    return 0;
 }
