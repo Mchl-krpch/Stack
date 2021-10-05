@@ -3,31 +3,27 @@
 
 #include <cmath>
 
+int const CANARY = 0xB12D00;
 
-typedef       int stack_type;
-typedef long long int canary;
+typedef  struct Stack{
+    int canary_beg;    //begin bird
+    int capacity;    //max size
+    int size;    //cur number of element
+    int *ptr_begin;    //stack path
+    int hash;    //stack hash
+    int canary_end;    //end bird
 
-extern int toxic;
-extern int ERROR_CODE;
+}Stack;
 
-
-typedef  struct stk{
-    canary         canary_beg;    //begin bird
-    int              capacity;    //max size
-    int                  size;    //cur number of element
-    stack_type     *ptr_begin;    //stack path
-    canary               hash;    //stack hash
-    canary         canary_end;    //end bird
-
-}stack_struct;
-
-void stack_ctor         (stack_struct *new_stack               );
-void stack_increase     (stack_struct *cur_stack               );
-void stack_push         (stack_struct *cur_stack, int value    );
-void stack_decrease     (stack_struct *cur_stack               );
-void stack_pop          (stack_struct *cur_stack, size_t pop_by);
-canary stack_hash_sum   (stack_struct *cur_stack               );
-void stack_dtor         (stack_struct *new_stack               );
+int stack_ctor (Stack *new_stack, int start_size);
+int stack_increase (Stack *cur_stack);
+int stack_push (Stack *cur_stack, int value);
+int stack_decrease (Stack *cur_stack);
+int stack_pop (Stack *cur_stack, size_t pop_by);
+int stack_hash (Stack *cur_stack);
+//alternative hash function
+int murmurhash (char *key, unsigned int len);
+int stack_dtor (Stack *new_stack);
 
 
 #endif //STACK_2_STACK_H
