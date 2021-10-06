@@ -5,9 +5,10 @@
 
 int stack_is_ok(Stack *stack, char *path, int line, const char *func_name) {
     int special_code = 0;
-    if (stack->size < 0) {
+
+    if (stack->canary_beg != Canary) {
         special_code += 1;
-        printf(RED"\nBAD_SIZE. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
+        printf(RED"\nBAD_CANARY_BEGIN. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
     }
 
     if (stack->capacity < 0) {
@@ -15,21 +16,22 @@ int stack_is_ok(Stack *stack, char *path, int line, const char *func_name) {
         printf(RED"\nBAD_CAPACITY. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
     }
 
+    if (stack->size < 0) {
+        special_code += 1;
+        printf(RED"\nBAD_SIZE. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
+    }
+
     if (stack->data == nullptr) {
         special_code += 1;
         printf(RED"\nBAD_PTR. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
     }
+    
     if (stack->hash != stack_hash(stack) ) {
         special_code += 1;
         printf(RED"\nBAD HASH. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
     }
 
-    if (stack->canary_beg != stack->data[0]) {
-        special_code += 1;
-        printf(RED"\nBAD_CANARY_BEGIN. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
-    }
-
-    if (stack->canary_end != stack->data[stack->capacity - 1]) {
+    if (stack->canary_end != Canary) {
         special_code += 1;
         printf(RED"\nBAD_CANARY_END. FILE: %s\nfunction: %s(%d)\n", path, func_name, line);
     }
