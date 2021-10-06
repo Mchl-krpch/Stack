@@ -6,18 +6,13 @@
 #include "stack.h"
 #include "output.h"
 
-const int IncreaseMultiplier = 2;
-
-const int Toxic  = 0xBADD;
-const int Free   = 0xF2EE;
-
 int CODE = 0;
 
-int stack_ctor(Stack *stack, int start_size) {
+int stack_ctor(Stack *stack, int start_capacity) {
     assert(stack != nullptr && "stack_ctor: stack = nullptr");
 
-    stack->size = start_size;
-    stack->capacity = start_size + 2;
+    stack->size = 0;
+    stack->capacity = start_capacity;
 
     stack->canary_beg = Canary;
     stack->canary_end = Canary;
@@ -27,14 +22,6 @@ int stack_ctor(Stack *stack, int start_size) {
     if (stack->data == nullptr) {
         stack_dump(stack, __func__, __LINE__);
     }
-
-    for (int index = 0; index < stack->capacity - 1; index++) {
-        stack->data[index] = Toxic;
-    }
-
-    stack->data[0] = stack->canary_beg;
-
-    stack->data[stack->capacity - 1] = stack->canary_end;
 
     stack->hash = stack_hash(stack);
 
@@ -46,19 +33,15 @@ int stack_push (Stack *stack, sType new_elem) {
 
     stack_dump(stack, __func__, __LINE__);
 
-    if (stack->size >= stack->capacity - 2) {
+    if (stack->size >= stack->capacity) {
         stack_increase(stack);
     }
 
-    stack->size++;
-    stack->hash = stack_hash(stack);
-    if ((stack->data[stack->size] != 0xBADD)) {
-        stack_dump(stack, __func__ , __LINE__);
-    }
     else {
         stack->data[stack->size] = new_elem;
+        stack->size++;
     }
-
+    
     stack->hash = stack_hash(stack);
 
     stack_dump(stack, __func__, __LINE__);
@@ -73,17 +56,11 @@ int stack_increase (Stack *stack) {
 
 
     stack->capacity *= IncreaseMultiplier;
-    stack->data = (int *) realloc(stack->data, stack->capacity * sizeof(int));
+    stack->data = (sType *) realloc(stack->data, stack->capacity * sizeof(sType));
 
     if (stack->data == nullptr) {
         stack_dump(stack, __func__, __LINE__);
     }
-
-    for (int elem = stack->size; elem < stack->capacity - 1; elem++) {
-        stack->data[elem] = Toxic;
-    }
-
-    stack->data[stack->capacity-1] = Canary;
 
     stack->hash = stack_hash(stack);
 
@@ -98,10 +75,9 @@ int stack_pop (Stack *stack) {
     stack_dump(stack, __func__, __LINE__);
 
     stack->size--;
-    stack->data[stack->size + 1] = Toxic;
     stack->hash = stack_hash(stack);
 
-    if (stack->size < ( (stack->capacity / IncreaseMultiplier)) - 2) {
+    if (stack->size <= (stack->capacity * 0.4) ) {
         stack_decrease(stack);
         stack->hash = stack_hash(stack);
     }
@@ -124,8 +100,6 @@ int stack_decrease (Stack *stack) {
         stack_dump(stack, __func__, __LINE__);
     }
 
-    stack->data[stack->capacity - 1] = Canary;
-
     stack->hash = stack_hash(stack);
 
     stack_dump(stack, __func__, __LINE__);
@@ -141,7 +115,7 @@ int stack_shrink (Stack *stack) {
 
     stack->data = (int *) realloc(stack->data, stack->size * sizeof(int));
 
-    stack->capacity = stack->size + 1;
+    stack->capacity = stack->size;
 
     if (stack->data == nullptr) {
         stack_dump(stack, __func__, __LINE__);
@@ -173,7 +147,7 @@ uint64_t stack_hash(Stack *stack) {
         res += data2[index] * index;
     }
 
-    printf("hash: %d sizeof: %d", res, sizeof(Stack));
+    //printf("hash: %d sizeof: %d", res, sizeof(Stack));
 
     return res;
 }
