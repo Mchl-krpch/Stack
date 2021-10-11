@@ -5,7 +5,7 @@
 **output.h(bold)** stack check.
 **output.c(bold)** stack validity realisation & logging(coming soon)
 
-Todo list:
+Todo list:  
 :black_square_button: make git ignore  
 :black_square_button: static functions  
 :black_square_button: delete abort in output.c  
