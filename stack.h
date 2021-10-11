@@ -4,34 +4,54 @@
 #include <cmath>
 #include <cstdint>
 
-int const Canary = 0xB12D00;
-int const IncreaseMultiplier = 2;
-int const DecreaseMultiplier = 0.4;
+#define DEBUG_LVL 0
 
-int const Toxic  = 0xBADD;
-int const Free   = 0xF2EE;
+#if DEBUG_LVL == 2
+    #define DEBUG_LVL_2
+	#define DEBUG_LVL_1
+#else
+	#if DEBUG_LVL == 1
+		#define DEBUG_LVL_1
+	#endif
+#endif
 
 typedef int sType;
 
+enum CONSTANS{
+	CANARY = 0xB12D00,
+	REALLOC_COEFF = 2,
+
+	TOXIC = 0xBADD,
+	FREE = 0xF2EE
+};
+
 typedef  struct{
-    int canary_beg;   //begin bird
-    int capacity;     //max size
-    int size;         //cur number of element
-    int *data;        //stack path
-    uint64_t hash;    //stack hash
-    int canary_end;	  //end bird
+	#ifdef DEBUG_LVL_1
+    	int		canary_beg;	//begin bird
+    #endif DEBUG_LVL_1
+
+    size_t		capacity;	//max size
+    size_t		size;		//cur number of element
+    sType		*data;		//stack path
+
+    #ifdef DEBUG_LVL_2
+    	uint64_t	hash;	//stack hash
+    #endif DEBUG_LVL_2
+
+    #ifdef DEBUG_LVL_1
+    	int		canary_end;	//end bird
+    #endif DEBUG_LVL_1
 
 }Stack;
 
-int stack_ctor (Stack *new_stack, int start_capacity );
-int stack_increase (Stack *cur_stack );
-int stack_push (Stack *cur_stack, sType value );
-int stack_decrease (Stack *cur_stack );
-int stack_shrink (Stack *stack ); 
-int stack_pop (Stack *cur_stack );
-uint64_t stack_hash (Stack *cur_stack );
-uint64_t murmurhash (char *key, unsigned int  );
-int stack_dtor (Stack *new_stack );
+int stack_ctor			(Stack *new_stack, size_t start_capacity);
+int stack_change_cap	(Stack *stack, size_t increase_by);
+
+int stack_push			(Stack *stack, sType value);
+int stack_pop			(Stack *stack);
+uint64_t stack_hash		(Stack *stack);
+uint64_t hash_buffer	(char *buffer, size_t size);
+int stack_dtor			(Stack *stack);
 
 
 #endif //STACK_2_STACK_H
