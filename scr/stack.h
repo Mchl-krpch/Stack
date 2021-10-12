@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdint>
 
-#define DEBUG_LVL 0
+#define DEBUG_LVL 2
 
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_2
@@ -17,13 +17,36 @@
 
 typedef int sType;
 
+#define GREEN  "\x1b[32m"
+#define RED    "\x1b[31m"
+#define WHITE  "\e[0;37m"
+
 enum CONSTANS{
 	CANARY = 0xB12D00,
 	REALLOC_COEFF = 2,
-
-	TOXIC = 0xBADD,
-	FREE = 0xF2EE
 };
+
+enum EXIT_CODES {
+    NO_ERRORS = 0,
+    BAD_STRUCT_PTR = 1,
+
+    #ifdef DEBUG_LVL_1
+        DEAD_CANARY_BEGIN = 10,
+    #endif DEBUG_LVL_1
+
+    BAD_CAPACITY = 100,
+    BAD_SIZE = 1000,
+    DATA_ERROR = 10000,
+
+    #ifdef DEBUG_LVL_2
+        BAD_HASH = 100000,
+    #endif DEBUG_LVL_2
+
+    #ifdef DEBUG_LVL_1
+        DEAD_CANARY_END = 1000000
+    #endif DEBUG_LVL_1
+};
+
 
 typedef  struct{
 	#ifdef DEBUG_LVL_1
@@ -45,13 +68,11 @@ typedef  struct{
 }Stack;
 
 int stack_ctor			(Stack *new_stack, size_t start_capacity);
-int stack_change_cap	(Stack *stack, size_t increase_by);
 
+int stack_resize		(Stack *stack, size_t increase_by);
 int stack_push			(Stack *stack, sType value);
 int stack_pop			(Stack *stack);
-uint64_t stack_hash		(Stack *stack);
-uint64_t hash_buffer	(char *buffer, size_t size);
-int stack_dtor			(Stack *stack);
 
+int stack_dtor			(Stack *stack);
 
 #endif //STACK_2_STACK_H
