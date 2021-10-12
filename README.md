@@ -2,7 +2,7 @@
 **stack.h (bold)** includes stack-functions, stack-struct, debug logic  
 **stack.c (bold)** it's realisation (all functions in stack.h + debug-functions: {stack_is_ok, stack_dump})  
   
-**output.h(bold)** stack check.  
+**output.h(bold)** stack check. (file and next file exists now but it is only for save code)  
 **output.c(bold)** stack validity realisation & logging(coming soon)  
 
 Todo list:  
