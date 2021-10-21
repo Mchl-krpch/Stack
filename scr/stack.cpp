@@ -69,7 +69,7 @@ static int stack_is_ok(Stack *stack) {
         special_code += BAD_CAPACITY;
     }
 
-    if (stack->size < 0) {
+    if (stack->size < 0 || stack->size > capacity) {
         special_code += BAD_SIZE;
     }
 
