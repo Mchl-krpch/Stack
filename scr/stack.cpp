@@ -1,9 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <cstdint>
 #include <assert.h>
 
 #include "stack.h"
-#include "stack_log.h"
 
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_1
@@ -11,12 +11,12 @@
 #else
     #if DEBUG_LVL == 1
         #define DEBUG_LVL_1
-    #else
-        #define HASH_CALCULATE
-        #define stack_dump(stack, __func__, __LINE__);
     #endif
 #endif
 
+///\brief calculate hash of buffer of bites
+///\param buffer example of buffer
+///\param size size of example of buffer
 static uint64_t hash_buffer(char *buffer, size_t size) {
     int hash = 0;
     int add = 0x5bd1e995;
@@ -24,12 +24,15 @@ static uint64_t hash_buffer(char *buffer, size_t size) {
     for (int index = 0; index < size; index++) {
         hash += buffer[index] * index;
         hash = hash << 1;
+        hash = hash ^ add;
     }
-    //printf("lol: %d\n", hash);
+    //printf("Hash now: %d\n", hash);
 
     return hash;
 }
 
+///\brief calculate hash of stack 
+///\param stack example of stack
 static uint64_t stack_hash(Stack *stack) {
     assert(stack != NULL && "hash_sum: cur_stack = NULL");
 
@@ -40,15 +43,16 @@ static uint64_t stack_hash(Stack *stack) {
     hash += hash_buffer((char *)stack->data, stack->capacity - 1);
     hash += hash_buffer((char *)stack + 4, sizeof(Stack) - 5 * sizeof(int));
 
-    hash == hash >> 1;
-    hash += 0x5bd1e995;
+    //hash == hash >> 1;
+    //hash += 0x5bd1e995;
 
     //printf("%d", hash);
 
     return hash;
 }
 
-
+///\brief count errors in stack's work
+///\param buffer example of stack
 #ifdef DEBUG_LVL_1
 static int stack_is_ok(Stack *stack) {
     int special_code = 0;
@@ -87,10 +91,116 @@ static int stack_is_ok(Stack *stack) {
     return special_code;
 }
 
+///\brief can write custom message in stdout with adress of error
+///\param stack example of stack
+///\param func_name function which contains error
+///\param line line where happens error
 static void error_message(Stack *stack, const char *func_name, int line) {
-    printf(RED"Error in function: %s(%d)\n", func_name, line);
+    printf("Error in function: %s(%d)\n", func_name, line);
 }
 
+///\brief checks stack's condition
+///\param output_file output file
+///\param stack example of stack
+static void print_check_stack(FILE *output_file, Stack *stack) {
+    fprintf(output_file,
+        "Stack preview:\n"
+        "\tcanary begin: %x\n"
+        "\tcapacity: %d\n"
+        "\tsize: %d\n"
+        "\thash: %d\n"
+        "\tcanary end: %x\n\n",
+
+        stack->canary_beg,
+        stack->capacity,
+        stack->size,
+        stack->hash,
+        stack->canary_end);
+}
+
+///\brief can write information about stack's condition
+///\param func_name name of current function
+///\param line current line which may contain an error
+///\param error_code this code measure up that function contains or not error
+static void update_log_file(Stack *stack, const char *func_name, int line, int error_code) {
+    FILE* output_file = fopen("../output.txt", "a");
+    fputs("_____________________\n", output_file);
+    //fputs("%s\n", __TIME__);
+
+    if (error_code == 0) {
+        fprintf(output_file, "Function: %s(%d) Work correct\n\n", func_name, line);
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    if ((error_code / DEAD_CANARY_BEGIN) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD CANARY:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    if ((error_code / BAD_CAPACITY) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD CAPACITY:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    if ((error_code / BAD_SIZE) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD SIZE:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    if ((error_code / DATA_ERROR) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD DATA:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    #ifdef DEBUG_LVL_2
+    if ((error_code / BAD_HASH) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD HASH:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+     #endif //DEBUG_LVL_2
+
+    if ((error_code / DEAD_CANARY_END) % 10 != 0) {
+        fprintf(output_file, "Function: %s(%d) ERROR\n\n", func_name, line);
+
+        fprintf(output_file, "BAD CANARY_END:\n");
+
+        print_check_stack(output_file, stack);
+
+        fprintf(output_file, "%s\n\n", __TIME__);
+    }
+
+    return;
+}
+
+///\brief analog of function "update_log_file" but it is work with console out
 static void stack_dump(Stack *stack, const char *func_name, int line) {
     if (stack == nullptr) {
         printf("Bad stack - struct ptr\n");
@@ -98,6 +208,7 @@ static void stack_dump(Stack *stack, const char *func_name, int line) {
 
 
     int code = stack_is_ok(stack);
+    update_log_file(stack, func_name, line, code);
 
     if (code == 0) {
         return;
@@ -107,56 +218,54 @@ static void stack_dump(Stack *stack, const char *func_name, int line) {
         error_message(stack, func_name, line);
 
         if (code % BAD_STRUCT_PTR != 0) {
-            printf(WHITE"%15s\t%-15s", "stack dump", "[ stack_ptr ]");
-            printf(RED"%10s", "(ERROR)\n");
+            printf("%15s\t%-15s", "stack", "[ stack_ptr ]");
+            printf("%10s", "\t(ERROR)\n");
             return;
         }
 
-        printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_beg ]");
+        printf("%15s\t%-15s", "stack", "[ canary_beg ]");
         if ((code / DEAD_CANARY_BEGIN) % 10 != 0) {
-            printf(RED"%10s", "\t(ERROR)\n");
+            printf("%10s", "\t(ERROR)\n");
         } else {
-            printf(GREEN"%10s", "(OK)\n");
+            printf("%10s", "(OK)\n");
         }
 
-        printf(WHITE"%15s\t%-15s", "stack dump", "[ Stack size ]");
+        printf("%15s\t%-15s", "stack", "[ Stack size ]");
         if ((code / BAD_CAPACITY) % 10 != 0) {
-            printf(RED"%10s", "\t(ERROR)\n");
+            printf("%10s", "\t(ERROR)\n");
         } else {
-            printf(GREEN"%10s", "(OK)\n");
+            printf("%10s", "(OK)\n");
         }
 
-        printf(WHITE"%15s\t%-15s", "stack dump", "[ capacity ]");
+        printf("%15s\t%-15s", "stack", "[  capacity  ]");
         if ((code / BAD_SIZE) % 10 != 0) {
-            printf(RED"%10s", "\t(ERROR)\n");
+            printf("%10s", "\t(ERROR)\n");
         } else {
-            printf(GREEN"%10s", "(OK)\n");
+            printf("%10s", "(OK)\n");
         }
 
-        printf(WHITE"%15s\t%-15s", "stack dump", "[ data ]");
+        printf("%15s\t%-15s", "stack", "[    data    ]");
         if ((code / DATA_ERROR) % 10 != 0) {
-            printf(RED"%10s", "\t(ERROR)\n");
+            printf("%10s", "\t(ERROR)\n");
         } else {
-            printf(GREEN"%10s", "(OK)\n");
+            printf("%10s", "(OK)\n");
         }
 
         #ifdef DEBUG_LVL_2
-            printf(WHITE"%15s\t%-15s", "stack dump", "[ hash ]");
+            printf("%15s\t%-15s", "stack", "[    hash    ]");
             if ((code / BAD_HASH) % 10 != 0) {
-                printf(RED"%10s", "\t(ERROR)\n");
+                printf("%10s", "\t(ERROR)\n");
             } else {
-                printf(GREEN"%10s", "(OK)\n");
+                printf("%10s", "(OK)\n");
             }
         #endif //DEBUG_LVL_2
 
-        printf(WHITE"%15s\t%-15s", "stack dump", "[ canary_end ]");
+        printf("%15s\t%-15s", "stack", "[ canary_end ]");
         if ((code / DEAD_CANARY_END) % 10 != 0) {
-            printf(RED"%10s", "\t(ERROR)\n");
+            printf("%10s", "\t(ERROR)\n");
         } else {
-            printf(GREEN"%10s", "(OK)\n");
+            printf("%10s", "(OK)\n");
         }
-
-        printf(RED"ERROR endng\n");
 
         return;
     }
