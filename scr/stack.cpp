@@ -23,6 +23,7 @@
 ///\param name path to file
 #if LOG_INFO == 1 
 void create_log_file(char *name){
+    assert(&name != NULL && "create_log_file: name: nullptr");
     printf("Enter path with name of your logfile...\n");
 
     scanf("%s", name);
@@ -123,6 +124,8 @@ static void error_message(Stack *stack, const char *func_name, int line) {
 ///\param stack stack example 
 #if LOG_INFO == 1
 static void print_stack_data(Stack *stack) {
+    assert(stack != NULL && "print_stack_data: cur_stack = NULL");
+
     FILE* output_file = fopen(name, "a");
 
     fprintf(output_file, "\n\tStack data{\n");
@@ -141,6 +144,7 @@ static void print_stack_data(Stack *stack) {
 #if LOG_INFO == 1
 static void print_check_stack(FILE *output_file, Stack *stack) {
     assert(stack != NULL && "print_check_stack: cur_stack = NULL");
+    assert(output_file != NULL && "print_check_stack: output_file = NULL");
 
     fprintf(output_file, "Stack preview:\n\tcanary begin: %x\n\tcapacity: %d\n\tsize: %d \n\thash: %d \n\tcanary end: %x\n\n", stack->canary_beg, stack->capacity, stack->size, (int)stack->hash, stack->canary_end);
 }
