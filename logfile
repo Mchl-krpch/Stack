@@ -1,0 +1,468 @@
+______________________________
+INFO: Function: stack_ctor(339)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 0 
+	hash: -1414850986 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 0 
+	hash: -1414850986 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 1 
+	hash: -1414856106 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 1 
+	hash: -1414856106 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 2 
+	hash: -1414848970 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 2 
+	hash: -1414848970 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 3 
+	hash: -1414854090 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 3 
+	hash: -1414854090 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 4 
+	hash: -1414904266 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 4 
+	hash: -1414904266 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 5 
+	hash: -1414909386 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 5 
+	hash: -1414909386 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 6 
+	hash: -1414853066 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 6 
+	hash: -1414853066 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 7 
+	hash: -1414907338 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 7 
+	hash: -1414907338 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 8 
+	hash: -1414875594 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 8
+	size: 8 
+	hash: -1414875594 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_resize(395)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 8 
+	hash: -1580172010 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 9 
+	hash: -1580144362 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(351)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 9 
+	hash: -1580144362 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_push(366)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 10 
+	hash: -1580145386 
+	canary end: b12d00
+
+______________________________
+INFO: Function: stack_top(413)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 10 
+	hash: -1580145386 
+	canary end: b12d00
+
+______________________________
+Function: stack_pop(425)
+ERROR::BAD_HASH
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 10 
+	hash: -1580145386 
+	canary end: b12d00
+
+An error has occurred, the further behavior of the stack is undefined, the enforcement is at your own risk
+This action happaned after stack error
+
+	Stack data{
+		e: 0
+		e: 10000000
+		e: 2
+		e: 3
+		e: 4
+		e: 5
+		e: 6
+		e: 7
+		e: 8
+		e: 9
+	}
+
+______________________________
+INFO: Function: stack_pop(443)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 9 
+	hash: -1565806314 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(425)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 9 
+	hash: -1565806314 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(443)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 8 
+	hash: -1565833962 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(425)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 8 
+	hash: -1565833962 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(443)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 7 
+	hash: -1565808362 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(425)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 7 
+	hash: -1565808362 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(443)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 6 
+	hash: -1565803242 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(425)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 6 
+	hash: -1565803242 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_pop(443)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 5 
+	hash: -1565818602 
+	canary end: b12d00
+
+This action happaned after stack error
+______________________________
+INFO: Function: stack_dtor(455)
+Work correct
+
+02:43:52
+
+Stack preview:
+	canary begin: b12d00
+	capacity: 16
+	size: 5 
+	hash: -1565818602 
+	canary end: b12d00
+
+This action happaned after stack error
