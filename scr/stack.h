@@ -9,6 +9,12 @@
 ///\param DEBUG_LVL_2 contains optional hash check
 #define DEBUG_LVL 2
 
+
+///\param LOG_INFO contains information that user want or not create logfile
+///param LOG_INFO_1 create logfile
+///param LOG_INFO_0 don't use logfile
+#define LOG_INFO 1
+
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_2
 	#define DEBUG_LVL_1
@@ -18,11 +24,18 @@
 	#endif
 #endif
 
+#ifdef DEBUG_LVL_1
+    extern int STACK_WORK;
+#endif DEBUG_LVL_1
+
 typedef int sType;
+
+extern char name[60];
 
 ///\brief contains main constants in stack
 ///\param CANARY special value which control content in stack
 ///\param REALLOC_COEFF corresponds to multiplier of stack increase/decrease
+enum CONSTANS{
 	CANARY = 0xB12D00,
 	REALLOC_COEFF = 2
 };
@@ -41,19 +54,19 @@ enum EXIT_CODES {
     BAD_STRUCT_PTR = 1,
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_BEGIN = 10,
+        DEAD_CANARY_BEGIN = 2,
     #endif DEBUG_LVL_1
 
-    BAD_CAPACITY = 100,
-    BAD_SIZE = 1000,
-    DATA_ERROR = 10000,
+    BAD_CAPACITY = 4,
+    BAD_SIZE = 8,
+    DATA_ERROR = 16,
 
     #ifdef DEBUG_LVL_2
-        BAD_HASH = 100000,
+        BAD_HASH = 32,
     #endif DEBUG_LVL_2
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_END = 1000000
+        DEAD_CANARY_END = 64,
     #endif DEBUG_LVL_1
 };
 
@@ -86,24 +99,32 @@ typedef  struct{
 ///\brief create stack
 ///\param new_stack stack example 
 ///\param start_capacity start max number of elements in stack
-int stack_ctor			(Stack *new_stack, size_t start_capacity);
+EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
 ///\param increase_by in what capacity we change current capacity of stack
-int stack_resize		(Stack *stack, size_t increase_by);
+EXIT_CODES stack_resize		(Stack *stack, size_t increase_by);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
 ///\param increase_by in what capacity we change current capacity of stack
-int stack_push			(Stack *stack, sType value);
+EXIT_CODES stack_push			(Stack *stack, sType value);
+
+///\brief returns last element in stack
+///\param new_stack stack example 
+EXIT_CODES stack_top           (Stack *stack, sType *top_element);
 
 ///\brief delete last element
 ///\param new_stack stack example 
-int stack_pop			(Stack *stack);
+EXIT_CODES stack_pop			(Stack *stack);
 
 ///\brief delete stack example
 ///\param new_stack stack example 
-int stack_dtor			(Stack *stack);
+EXIT_CODES stack_dtor			(Stack *stack);
+
+///\brief create special file which contains stack work information
+///\param path path of logfile
+void create_log_file(char *path);
 
 #endif //STACK_2_STACK_H
