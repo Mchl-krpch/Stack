@@ -2,18 +2,18 @@
 
 #include "stack.h"
 
+#if LOG_INFO == 1
+char name[60] = "logfile";
+#else
 char name[60];
+#endif
 
 int main() {
     Stack stack;
     int code = 0;
     sType top_element;
 
-    #if LOG_INFO == 1
-        create_log_file(name);
-    #endif
-
-    code = stack_ctor(&stack, 8);
+    code = stack_ctor(&stack, 8, name);
     if (code != NO_ERRORS) {
         return -1;
     }
