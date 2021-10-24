@@ -9,6 +9,7 @@
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_1
     #define DEBUG_LVL_2
+    //#define output_file stdout
 #else
     #if DEBUG_LVL == 1
         #define DEBUG_LVL_1
@@ -88,6 +89,7 @@ static int stack_is_ok(Stack *stack) {
 
     return special_code;
 }
+#endif
 
 ///\brief can write custom message in stdout with adress of error
 ///\param stack example of stack
@@ -101,17 +103,32 @@ static void error_message(Stack *stack, const char *func_name, int line) {
 
 ///\brief print information about stack's data
 ///\param stack stack example 
-#if LOG_INFO == 1
+#ifdef DEBUG_LVL_2
+    static void print_stack_data(Stack *stack) {
+        assert(stack != NULL && "print_stack_data: cur_stack = NULL");
+
+        FILE* output_file = fopen(name, "a");
+
+        fprintf(output_file, "\n\tStack data{\n");
+                for (int elem = 0; elem < stack->size; elem++) {
+                    fprintf(output_file, "\t\te: %d\n", stack->data[elem]);
+                }
+        fprintf(output_file, "\t}\n\n");
+
+        return;
+    }
+#else
+
+///\brief print information about stack's data
+///\param stack stack example 
 static void print_stack_data(Stack *stack) {
     assert(stack != NULL && "print_stack_data: cur_stack = NULL");
 
-    FILE* output_file = fopen(name, "a");
-
-    fprintf(output_file, "\n\tStack data{\n");
+    fprintf(stdout, "\n\tStack data{\n");
             for (int elem = 0; elem < stack->size; elem++) {
-                fprintf(output_file, "\t\te: %d\n", stack->data[elem]);
+                fprintf(stdout, "\t\te: %d\n", stack->data[elem]);
             }
-    fprintf(output_file, "\t}\n\n");
+    fprintf(stdout, "\t}\n\n");
 
     return;
 }
@@ -120,175 +137,107 @@ static void print_stack_data(Stack *stack) {
 ///\brief checks stack's condition
 ///\param output_file output file
 ///\param stack example of stack
-#if LOG_INFO == 1
 static void print_check_stack(FILE *output_file, Stack *stack) {
     assert(stack != NULL && "print_check_stack: cur_stack = NULL");
     assert(output_file != NULL && "print_check_stack: output_file = NULL");
 
-    fprintf(output_file, "Stack preview:\n\tcanary begin: %x\n\tcapacity: %d\n\tsize: %d \n\thash: %d \n\tcanary end: %x\n\n", stack->canary_beg, stack->capacity, stack->size, (int)stack->hash, stack->canary_end);
+    #if DEBUG_LVL == 2
+    fprintf(output_file, "Stack preview:\n\tcanary begin: %x\n\tcapacity: %d\n\tsize: %d \n\thash: %d \n\tcanary end: %x\n\n",stack->canary_beg, stack->capacity, stack->size, (int)stack->hash, stack->canary_end);
+    #else
+    fprintf(stdout, "Stack preview:\n\tcanary begin: %x\n\tcapacity: %d\n\tsize: %d \n\tcanary end: %x\n\n",stack->canary_beg, stack->capacity, stack->size, stack->canary_end);
+    #endif 
 }
-#endif
-
-///\brief can write information about stack's condition
-///\param func_name name of current function
-///\param line current line which may contain an error
-///\param error_code this code measure up that function contains or not error
-#if LOG_INFO == 1
-static void update_log_file(Stack *stack, const char *func_name, int line, int error_code) {
-    assert(stack != NULL && "update_log_file: cur_stack = NULL");
-
-    FILE* output_file = fopen(name, "a");
-    fputs("______________________________\n", output_file);
-    //fputs("%s\n", __TIME__);
-
-    if (error_code == 0) {
-         fprintf(output_file, "INFO: Function: %s(%d)\n", func_name, line);
-         fprintf(output_file, "Work correct\n\n");
-    }
-
-    if (error_code > 0) {
-        fprintf(output_file, "Function: %s(%d)\n", func_name, line);
-    }
-
-    if ((error_code & DEAD_CANARY_BEGIN) != 0) {
-        fprintf(output_file, "ERROR::DEAD_CANARY_BEGIN\n\n");
-        fprintf(output_file, "expected canary begin value: %X\n\n", CANARY);
-    }
-
-    if ((error_code & BAD_CAPACITY) != 0) {
-        fprintf(output_file, "Function: %s(%d) ERROR::BAD_CAPACITY\n\n", func_name, line);
-        fprintf(output_file, "capacity_value should be above zero\n\n");
-    }
-
-    if ((error_code & BAD_SIZE) != 0) {
-        fprintf(output_file, "ERROR::BAD_SIZE\n\n");
-        fprintf(output_file, "size_value should be above zero\n\n");
-    }
-
-    if ((error_code & DATA_ERROR) != 0) {
-        fprintf(output_file, "ERROR::DATA_ERROR\n\n");
-        fprintf(output_file, "data is not nullptr\n\n");
-    }
-
-    #ifdef DEBUG_LVL_2
-    if ((error_code & BAD_HASH) != 0) {
-        fprintf(output_file, "ERROR::BAD_HASH\n\n");
-    }
-     #endif //DEBUG_LVL_2
-
-    if ((error_code & DEAD_CANARY_END) != 0) {
-        fprintf(output_file, "ERROR::DEAD_CANARY_END\n\n");
-        fprintf(output_file, "expected canary end value: %X\n\n", CANARY);
-    }
-
-    fprintf(output_file, "%s\n\n", __TIME__);
-
-    if ( ((error_code & BAD_HASH) != 0) || ((error_code & DEAD_CANARY_END) != 0) || ((error_code & DEAD_CANARY_BEGIN) != 0)) {
-        print_stack_data(stack);
-    }
-
-    print_check_stack(output_file, stack);
-
-    if ( ((error_code ^ NO_ERRORS) != 0) && (stack->stack_is_not_work == 0)) {
-        fprintf(output_file, "An error has occurred, the further behavior of the stack is undefined, the enforcement is at your own risk\n");
-    }
-
-
-    if (error_code ^ NO_ERRORS != 0){
-        stack->stack_is_not_work = 1;
-    }
-
-    if (stack->stack_is_not_work == 1) {
-        fprintf(output_file, "This action happaned after stack error\n");
-    }
-
-    return;
-}
-#endif
 
 ///\brief analog of function "update_log_file" but it is work with console out
+#ifdef DEBUG_LVL_1
 static void stack_dump(Stack *stack, const char *func_name, int line) {
     assert(stack != NULL && "stack_dump: cur_stack = NULL");
 
-    int code = stack_is_ok(stack);
+    int error_code = stack_is_ok(stack);
 
-    #if LOG_INFO == 1
-    update_log_file(stack, func_name, line, code);
-    #endif
+        #if DEBUG_LVL == 2
+        FILE* output_file = fopen(name, "a");
+        #else
+        #define output_file stdout
+        #endif 
 
-    if (code == 0) {
-        return;
-    }
+        fputs("______________________________\n", output_file);
+        //fputs("%s\n", __TIME__);
 
-    else {
-        error_message(stack, func_name, line);
-
-        if (code & BAD_STRUCT_PTR != 0) {
-            printf("%15s\t%-15s", "stack", "[ stack_ptr ]");
-            printf("%10s", "\t(ERROR)\n");
-            return;
+        if (error_code == 0) {
+             fprintf(output_file, "INFO: Function: %s(%d)\n", func_name, line);
+             fprintf(output_file, "Work correct\n\n");
         }
 
-        printf("%15s\t%-15s", "stack", "[ canary_beg ]");
-        if ((code & DEAD_CANARY_BEGIN) != 0) {
-            printf("%10s", "\t(ERROR)\n");
-        } else {
-            printf("%10s", "(OK)\n");
+        if (error_code > 0) {
+            fprintf(output_file, "Function: %s(%d)\n", func_name, line);
         }
 
-        printf("%15s\t%-15s", "stack", "[ Stack size ]");
-        if ((code & BAD_CAPACITY) != 0) {
-            printf("%10s", "\t(ERROR)\n");
-        } else {
-            printf("%10s", "(OK)\n");
+        if ((error_code & DEAD_CANARY_BEGIN) != 0) {
+            fprintf(output_file, "ERROR::DEAD_CANARY_BEGIN\n\n");
+            fprintf(output_file, "expected canary begin value: %X\n\n", CANARY);
         }
 
-        printf("%15s\t%-15s", "stack", "[  capacity  ]");
-        if ((code & BAD_SIZE) != 0) {
-            printf("%10s", "\t(ERROR)\n");
-        } else {
-            printf("%10s", "(OK)\n");
+        if ((error_code & BAD_CAPACITY) != 0) {
+            fprintf(output_file, "Function: %s(%d) ERROR::BAD_CAPACITY\n\n", func_name, line);
+            fprintf(output_file, "capacity_value should be above zero\n\n");
         }
 
-        printf("%15s\t%-15s", "stack", "[    data    ]");
-        if ((code & DATA_ERROR) != 0) {
-            printf("%10s", "\t(ERROR)\n");
-        } else {
-            printf("%10s", "(OK)\n");
+        if ((error_code & BAD_SIZE) != 0) {
+            fprintf(output_file, "ERROR::BAD_SIZE\n\n");
+            fprintf(output_file, "size_value should be above zero\n\n");
+        }
+
+        if ((error_code & DATA_ERROR) != 0) {
+            fprintf(output_file, "ERROR::DATA_ERROR\n\n");
+            fprintf(output_file, "data is not nullptr\n\n");
         }
 
         #ifdef DEBUG_LVL_2
-            printf("%15s\t%-15s", "stack", "[    hash    ]");
-            if ((code & BAD_HASH) != 0) {
-                printf("%10s", "\t(ERROR)\n");
-            } else {
-                printf("%10s", "(OK)\n");
-            }
-        #endif //DEBUG_LVL_2
+        if ((error_code & BAD_HASH) != 0) {
+            fprintf(output_file, "ERROR::BAD_HASH\n\n");
+        }
+         #endif //DEBUG_LVL_2
 
-        printf("%15s\t%-15s", "stack", "[ canary_end ]");
-        if ((code & DEAD_CANARY_END) != 0) {
-            printf("%10s", "\t(ERROR)\n");
-        } else {
-            printf("%10s", "(OK)\n");
+        if ((error_code & DEAD_CANARY_END) != 0) {
+            fprintf(output_file, "ERROR::DEAD_CANARY_END\n\n");
+            fprintf(output_file, "expected canary end value: %X\n\n", CANARY);
         }
 
-        #ifdef DEBUG_LVL_2
-            if ((code & BAD_HASH) != 0) {
-                printf("\n\tStack data{\n");
-                for (int elem = 0; elem < stack->size; elem++) {
-                    printf("\t\te: %d\n", stack->data[elem]);
-                }
-                printf("\t}\n\n");
-            }
-        #endif //DEBUG_LVL_2
-        return;
-    }
+        fprintf(output_file, "%s\n\n", __TIME__);
+
+        #if DEBUG_LVL == 2
+        if ( ((error_code & BAD_HASH) != 0) || ((error_code & DEAD_CANARY_END) != 0) || ((error_code & DEAD_CANARY_BEGIN) != 0)) {
+            print_stack_data(stack);
+        }
+        #endif
+
+        #if DEBUG_LVL == 1
+        if ( ((error_code & DEAD_CANARY_END) != 0) || ((error_code & DEAD_CANARY_BEGIN) != 0)) {
+            print_stack_data(stack);
+        }
+        #endif
+
+        print_check_stack(output_file, stack);
+
+        if ( ((error_code ^ NO_ERRORS) != 0) && (stack->stack_is_not_work == 0)) {
+            fprintf(output_file, "An error has occurred, the further behavior of the stack is undefined, the enforcement is at your own risk\n");
+        }
+
+
+        if (error_code ^ NO_ERRORS != 0) {
+            stack->stack_is_not_work = 1;
+        }
+
+        if (stack->stack_is_not_work == 1) {
+            fprintf(output_file, "This action happaned after stack error\n");
+        }
+
 }
 #endif //DEBUG_LVL_1
 
 EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity, char *log_file) {
-    if (stack == nullptr){
+    if (stack == nullptr) {
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
@@ -296,8 +245,8 @@ EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity, char *log_file) {
     stack->capacity = start_capacity;
     stack->stack_is_not_work = 0;
 
-    #if LOG_INFO == 1
-        if (log_file != nullptr){
+    #if DEBUG_LVL == 2
+        if (log_file != nullptr) {
             FILE *INPUT_FILE = fopen(name, "w+");
         }
     #endif
@@ -356,7 +305,7 @@ EXIT_CODES stack_push (Stack *stack, sType new_elem) {
 }
 
 EXIT_CODES stack_resize(Stack *stack, size_t increase_by) {
-    if (stack == nullptr){
+    if (stack == nullptr) {
         return BAD_STRUCT_PTR;
     }
 
@@ -385,11 +334,11 @@ EXIT_CODES stack_resize(Stack *stack, size_t increase_by) {
 }
 
 EXIT_CODES stack_top (Stack *stack, sType *top_element) {
-    if (stack == nullptr){
+    if (stack == nullptr) {
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
-    if (stack->data == nullptr){
+    if (stack->data == nullptr) {
         return EXIT_CODES::DATA_ERROR;
     }
 
@@ -403,7 +352,7 @@ EXIT_CODES stack_top (Stack *stack, sType *top_element) {
 }
 
 EXIT_CODES stack_pop (Stack *stack) {
-    if (stack == nullptr){
+    if (stack == nullptr) {
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
@@ -433,7 +382,7 @@ EXIT_CODES stack_pop (Stack *stack) {
 }
 
 EXIT_CODES stack_dtor(Stack *stack) {
-    if (stack == nullptr){
+    if (stack == nullptr) {
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
