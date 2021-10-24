@@ -15,22 +15,6 @@
     #endif
 #endif
 
-///\brief create new file which will contain stack's work info
-///\param name path to file
-#if LOG_INFO == 1 
-void create_log_file(char *name){
-    printf("Enter path with name of your logfile...\n");
-
-    scanf("%s", name);
-
-    #if LOG_INFO == 1
-        FILE *INPUT_FILE = fopen(name, "w+");
-    #endif
-
-    return;
-}
-#endif
-
 ///\brief calculate hash of buffer of bites
 ///\param buffer example of buffer
 ///\param size size of example of buffer
@@ -303,7 +287,7 @@ static void stack_dump(Stack *stack, const char *func_name, int line) {
 }
 #endif //DEBUG_LVL_1
 
-EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
+EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity, char *log_file) {
     if (stack == nullptr){
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
@@ -311,6 +295,12 @@ EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
     stack->size = 0;
     stack->capacity = start_capacity;
     stack->stack_is_not_work = 0;
+
+    #if LOG_INFO == 1
+        if (log_file != nullptr){
+            FILE *INPUT_FILE = fopen(name, "w+");
+        }
+    #endif
 
     #ifdef DEBUG_LVL_1
         stack->canary_beg = 0xb12d00;
