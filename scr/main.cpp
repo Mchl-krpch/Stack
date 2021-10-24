@@ -2,7 +2,7 @@
 
 #include "stack.h"
 
-#if LOG_INFO == 1
+#if DEBUG_LVL == 2
 char name[60] = "logfile";
 #else
 char name[60];
