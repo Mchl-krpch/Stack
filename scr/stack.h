@@ -20,8 +20,6 @@
 
 typedef int sType;
 
-extern char name[60];
-
 
 ///\brief contains main constants in stack
 ///\param CANARY special value which control content in stack
@@ -45,19 +43,19 @@ enum EXIT_CODES {
     BAD_STRUCT_PTR = 1,
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_BEGIN = 1 << 1,
+        DEAD_CANARY_BEGIN = 2,
     #endif DEBUG_LVL_1
 
-    BAD_CAPACITY = 1 << 2,
-    BAD_SIZE = 1 << 3,
-    DATA_ERROR = 1 << 4,
+    BAD_CAPACITY = 4,
+    BAD_SIZE = 8,
+    DATA_ERROR = 16,
 
     #ifdef DEBUG_LVL_2
-        BAD_HASH = 1 << 5,
+        BAD_HASH = 32,
     #endif DEBUG_LVL_2
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_END = 1 << 6,
+        DEAD_CANARY_END = 64,
     #endif DEBUG_LVL_1
 };
 
@@ -73,8 +71,8 @@ typedef  struct{
     	int		canary_beg;	//begin bird
     #endif DEBUG_LVL_1
 
-    size_t		capacity;	//max size
-    size_t		size;		//cur number of element
+    int		capacity;	//max size
+    int		size;		//cur number of element
     sType		*data;		//stack path
 
     #ifdef DEBUG_LVL_2
@@ -94,7 +92,7 @@ typedef  struct{
 ///\brief create stack
 ///\param new_stack stack example 
 ///\param start_capacity start max number of elements in stack
-EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity, char *log_file);
+EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
@@ -117,9 +115,5 @@ EXIT_CODES stack_pop			(Stack *stack);
 ///\brief delete stack example
 ///\param new_stack stack example 
 EXIT_CODES stack_dtor			(Stack *stack);
-
-///\brief create special file which contains stack work information
-///\param path path of logfile
-void create_log_file(char *path);
 
 #endif //STACK_2_STACK_H
