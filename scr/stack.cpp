@@ -310,7 +310,7 @@ static void stack_dump(Stack *stack, const char *func_name, int line) {
 
 EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
     if (stack == nullptr){
-        return BAD_STRUCT_PTR;
+        return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
     stack->size = 0;
@@ -328,7 +328,7 @@ EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
             stack_dump(stack, __func__, __LINE__);
         #endif //DEBUG_LVL_1
 
-        return NO_ERRORS;
+        return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
     #ifdef DEBUG_LVL_2
