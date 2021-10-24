@@ -24,10 +24,6 @@
 	#endif
 #endif
 
-#ifdef DEBUG_LVL_1
-    extern int STACK_WORK;
-#endif DEBUG_LVL_1
-
 typedef int sType;
 
 extern char name[60];
@@ -89,6 +85,10 @@ typedef  struct{
     #ifdef DEBUG_LVL_2
     	uint64_t	hash;	//stack hash
     #endif DEBUG_LVL_2
+
+    #ifdef DEBUG_LVL_1
+        int     stack_is_not_work; //begin bird
+    #endif DEBUG_LVL_1
 
     #ifdef DEBUG_LVL_1
     	int		canary_end;	//end bird
