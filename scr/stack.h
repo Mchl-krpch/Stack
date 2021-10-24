@@ -54,19 +54,19 @@ enum EXIT_CODES {
     BAD_STRUCT_PTR = 1,
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_BEGIN = 2,
+        DEAD_CANARY_BEGIN = 1 << 1,
     #endif DEBUG_LVL_1
 
-    BAD_CAPACITY = 4,
-    BAD_SIZE = 8,
-    DATA_ERROR = 16,
+    BAD_CAPACITY = 1 << 2,
+    BAD_SIZE = 1 << 3,
+    DATA_ERROR = 1 << 4,
 
     #ifdef DEBUG_LVL_2
-        BAD_HASH = 32,
+        BAD_HASH = 1 << 5,
     #endif DEBUG_LVL_2
 
     #ifdef DEBUG_LVL_1
-        DEAD_CANARY_END = 64,
+        DEAD_CANARY_END = 1 << 6,
     #endif DEBUG_LVL_1
 };
 
