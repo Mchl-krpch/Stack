@@ -26,7 +26,9 @@
 
 typedef int sType;
 
+#if LOG_INFO == 1
 extern char name[60];
+#endif
 
 ///\brief contains main constants in stack
 ///\param CANARY special value which control content in stack
@@ -99,7 +101,7 @@ typedef  struct{
 ///\brief create stack
 ///\param new_stack stack example 
 ///\param start_capacity start max number of elements in stack
-EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity);
+EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity, char *log_file);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
