@@ -9,12 +9,6 @@
 ///\param DEBUG_LVL_2 contains optional hash check
 #define DEBUG_LVL 2
 
-
-///\param LOG_INFO contains information that user want or not create logfile
-///param LOG_INFO_1 create logfile
-///param LOG_INFO_0 don't use logfile
-#define LOG_INFO 1
-
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_2
 	#define DEBUG_LVL_1
@@ -26,9 +20,8 @@
 
 typedef int sType;
 
-#if LOG_INFO == 1
 extern char name[60];
-#endif
+
 
 ///\brief contains main constants in stack
 ///\param CANARY special value which control content in stack
