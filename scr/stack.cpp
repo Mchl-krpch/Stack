@@ -15,15 +15,10 @@
     #endif
 #endif
 
-#ifdef DEBUG_LVL_1
-    int STACK_IS_NOT_WORK = 0;
-#endif DEBUG_LVL_1
-
 ///\brief create new file which will contain stack's work info
 ///\param name path to file
 #if LOG_INFO == 1 
 void create_log_file(char *name){
-    assert(&name != NULL && "create_log_file: name: nullptr");
     printf("Enter path with name of your logfile...\n");
 
     scanf("%s", name);
@@ -210,16 +205,16 @@ static void update_log_file(Stack *stack, const char *func_name, int line, int e
 
     print_check_stack(output_file, stack);
 
-    if ( ((error_code ^ NO_ERRORS) != 0) && (STACK_IS_NOT_WORK == 0)) {
+    if ( ((error_code ^ NO_ERRORS) != 0) && (stack->stack_is_not_work == 0)) {
         fprintf(output_file, "An error has occurred, the further behavior of the stack is undefined, the enforcement is at your own risk\n");
     }
 
 
     if (error_code ^ NO_ERRORS != 0){
-        STACK_IS_NOT_WORK = 1;
+        stack->stack_is_not_work = 1;
     }
 
-    if (STACK_IS_NOT_WORK == 1) {
+    if (stack->stack_is_not_work == 1) {
         fprintf(output_file, "This action happaned after stack error\n");
     }
 
@@ -315,6 +310,7 @@ EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
 
     stack->size = 0;
     stack->capacity = start_capacity;
+    stack->stack_is_not_work = 0;
 
     #ifdef DEBUG_LVL_1
         stack->canary_beg = 0xb12d00;
