@@ -117,3 +117,4 @@ EXIT_CODES stack_pop			(Stack *stack);
 EXIT_CODES stack_dtor			(Stack *stack);
 
 #endif //STACK_2_STACK_H
+
