@@ -19,6 +19,7 @@
 
 #if DEBUG_LVL == 2
 char *name = "logfile";
+FILE *output_file = fopen(name, "w+");
 #endif
 #if DEBUG_LVL == 1
 #endif
