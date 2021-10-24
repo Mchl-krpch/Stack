@@ -9,7 +9,6 @@
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_1
     #define DEBUG_LVL_2
-    //#define output_file stdout
 #else
     #if DEBUG_LVL == 1
         #define DEBUG_LVL_1
@@ -18,10 +17,10 @@
 #endif
 
 #if DEBUG_LVL == 2
-char *name = "logfile";
-FILE *output_file = fopen(name, "w+");
+    char *name = "logfile";
+    FILE *output_file = fopen(name, "w+");
 #endif
-#if DEBUG_LVL == 1
+    #if DEBUG_LVL == 1
 #endif
 
 ///\brief calculate hash of buffer of bites
