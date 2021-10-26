@@ -7,7 +7,7 @@
 ///\param DEBUG_LVL mesure up level of debug check
 ///\param DEBUG_LVL_1 contains only canaries checks
 ///\param DEBUG_LVL_2 contains optional hash check
-#define DEBUG_LVL 2
+#define DEBUG_LVL 1
 
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_2
@@ -19,7 +19,6 @@
 #endif
 
 typedef int sType;
-
 
 ///\brief contains main constants in stack
 ///\param CANARY special value which control content in stack
@@ -71,17 +70,21 @@ typedef  struct{
     	int		canary_beg;	//begin bird
     #endif DEBUG_LVL_1
 
-    int		capacity;	//max size
-    int		size;		//cur number of element
-    sType		*data;		//stack path
+    int		capacity; //max size
+    int		size; //cur number of element
+    sType		*data; //stack path
 
     #ifdef DEBUG_LVL_2
-    	uint64_t	hash;	//stack hash
+    	uint64_t	hash; //stack hash
     #endif DEBUG_LVL_2
 
     #ifdef DEBUG_LVL_1
-        int     stack_is_not_work; //begin bird
+        int     stack_is_not_work; //bool value. it need to understand stack is working or not
     #endif DEBUG_LVL_1
+
+    #ifdef DEBUG_LVL_2
+        FILE *output_file;
+    #endif
 
     #ifdef DEBUG_LVL_1
     	int		canary_end;	//end bird
@@ -92,29 +95,28 @@ typedef  struct{
 ///\brief create stack
 ///\param new_stack stack example 
 ///\param start_capacity start max number of elements in stack
-EXIT_CODES stack_ctor			(Stack *new_stack, size_t start_capacity);
+EXIT_CODES stack_ctor (Stack *new_stack, size_t start_capacity);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
 ///\param increase_by in what capacity we change current capacity of stack
-EXIT_CODES stack_resize		(Stack *stack, size_t increase_by);
+EXIT_CODES stack_resize (Stack *stack, size_t increase_by);
 
 ///\brief changes capacity of stack 
 ///\param new_stack stack example 
 ///\param increase_by in what capacity we change current capacity of stack
-EXIT_CODES stack_push			(Stack *stack, sType value);
+EXIT_CODES stack_push (Stack *stack, sType value);
 
 ///\brief returns last element in stack
 ///\param new_stack stack example 
-EXIT_CODES stack_top           (Stack *stack, sType *top_element);
+EXIT_CODES stack_top (Stack *stack, sType *top_element);
 
 ///\brief delete last element
 ///\param new_stack stack example 
-EXIT_CODES stack_pop			(Stack *stack);
+EXIT_CODES stack_pop (Stack *stack);
 
 ///\brief delete stack example
 ///\param new_stack stack example 
-EXIT_CODES stack_dtor			(Stack *stack);
+EXIT_CODES stack_dtor (Stack *stack);
 
 #endif //STACK_2_STACK_H
-
