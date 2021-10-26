@@ -17,14 +17,6 @@
     #endif
 #endif
 
-/*#if DEBUG_LVL == 2
-    char *name = "logfile";
-    FILE *output_file = fopen(name, "w+");
-#endif
-#if DEBUG_LVL == 1
-    #define output_file stdout
-#endif*/
-
 ///\brief calculate hash of buffer of bites
 ///\param buffer example of buffer
 ///\param size size of example of buffer
