@@ -15,20 +15,13 @@ int main() {
         return -1;
     }
 
-    for (int elem = 0; elem < 10; elem++) {
+    for (int elem = 0; elem < 100; elem++) {
         code = stack_push(&stack, elem);
         if (code != NO_ERRORS) {
             stack_dtor(&stack);
 
             return -1;
         }
-    }
-
-    code = stack_top(&stack, &top_element);
-    if (code != NO_ERRORS) {
-        stack_dtor(&stack);
-
-        return -1;
     }
 
     //===============CHECKS================
@@ -67,7 +60,15 @@ int main() {
 
     //===============CHECKS================
 
-    for (int elem = 0; elem < 5; elem++) {
+    for (int elem = 0; elem < 100; elem++) {
+        code = stack_top(&stack, &top_element);
+        if (code != NO_ERRORS) {
+            stack_dtor(&stack);
+
+            return -1;
+        }
+        printf("e: %d\n", top_element);
+
         code = stack_pop(&stack);
         if (code != NO_ERRORS) {
             stack_dtor(&stack);
@@ -76,6 +77,8 @@ int main() {
         }
     }
 
+    printf("size: %d", stack.size);
+    
     code = stack_dtor(&stack);
     if (code != NO_ERRORS) {
         return -1;
