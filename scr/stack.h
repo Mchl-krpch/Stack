@@ -7,7 +7,7 @@
 ///\param DEBUG_LVL mesure up level of debug check
 ///\param DEBUG_LVL_1 contains only canaries checks
 ///\param DEBUG_LVL_2 contains optional hash check
-#define DEBUG_LVL 1
+#define DEBUG_LVL 2
 
 #if DEBUG_LVL == 2
     #define DEBUG_LVL_2
