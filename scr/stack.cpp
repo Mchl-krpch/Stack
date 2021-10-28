@@ -236,8 +236,15 @@
 
 EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
     if (stack == nullptr) {
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+        stack = nullptr;
+
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
+
+    #ifdef DEBUG_LVL_2
+        stack->output_file = fopen("log3", "w+");
+    #endif
 
     stack->size = 0;
     stack->capacity = start_capacity;
@@ -274,6 +281,8 @@ EXIT_CODES stack_ctor(Stack *stack, size_t start_capacity) {
 
 EXIT_CODES stack_push (Stack *stack, sType new_elem) {
     if (stack == nullptr){
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
@@ -309,6 +318,8 @@ EXIT_CODES stack_push (Stack *stack, sType new_elem) {
 
 EXIT_CODES stack_resize(Stack *stack, size_t increase_by) {
     if (stack == nullptr) {
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+
         return BAD_STRUCT_PTR;
     }
 
@@ -350,6 +361,8 @@ EXIT_CODES stack_resize(Stack *stack, size_t increase_by) {
 
 EXIT_CODES stack_top (Stack *stack, sType *top_element) {
     if (stack == nullptr) {
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+
         return EXIT_CODES::BAD_STRUCT_PTR;
     }
 
@@ -375,14 +388,15 @@ EXIT_CODES stack_top (Stack *stack, sType *top_element) {
 }
 
 EXIT_CODES stack_pop (Stack *stack) {
+    if (stack == nullptr) {
+        return EXIT_CODES::BAD_STRUCT_PTR;
+
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+    }
 
     #ifdef DEBUG_LVL_1
         stack_dump(stack, __func__, __LINE__);
     #endif
-
-    if (stack == nullptr) {
-        return EXIT_CODES::BAD_STRUCT_PTR;
-    }
 
     if(stack->capacity < 0) {
         return EXIT_CODES::BAD_CAPACITY;
@@ -416,7 +430,9 @@ EXIT_CODES stack_pop (Stack *stack) {
 
 EXIT_CODES stack_dtor(Stack *stack) {
     if (stack == nullptr) {
-        return EXIT_CODES::BAD_STRUCT_PTR;
+        printf("fatal error: BAD STACK PTR, please check entered parametres of function: %s\n", __func__);
+
+        return BAD_STRUCT_PTR;
     }
 
     if(stack->size < 0) {
